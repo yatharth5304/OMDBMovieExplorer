@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OMDB Movie Explorer</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+	<div class="container">
+		<h1>🎬 OMDB Movie Explorer</h1>
+
+		<div class="search-box">
+			<input type="text" id="searchInput" placeholder="Search movies..."
+				onkeydown="handleSearchKey(event)">
+			<button onclick="searchMovies()">Search</button>
+		</div>
+
+		<div id="searchSection" style="display: none;">
+			<h2>🎥 Search Results</h2>
+			<div id="movies" class="movies-grid"></div>
+		</div>
+
+		<h2>⭐Favorites</h2>
+		<div id="favorites" class="movies-grid"></div>
+	</div>
+
+	<script src="js/omdb.js"></script>
+
+	<div id="movieModal" class="modal hidden" onclick="closeModal()">
+		<div class="modal-content" onclick="event.stopPropagation()">
+			<span class="close-btn" onclick="closeModal()">✖</span>
+			<div id="modalBody"></div>
+		</div>
+	</div>
+
+	<footer class="footer">
+		<p>
+			© 2026 | <strong>OMDB Movie Explorer</strong><br> Created by
+			Yatharth Maharwade using Spring Boot, PostgreSQL & JavaScript
+		</p>
+	</footer>
+
+</body>
+</html>

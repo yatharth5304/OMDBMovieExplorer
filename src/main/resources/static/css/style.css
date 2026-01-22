@@ -1,0 +1,139 @@
+body {
+	font-family: "Segoe UI", Arial, sans-serif;
+	background: linear-gradient(to right, #f8f9fa, #eef1f5);
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+}
+
+.container {
+	max-width: 1000px;
+	margin: auto;
+	padding: 30px 20px;
+	flex: 1;
+}
+
+h1 {
+	text-align: center;
+	margin-bottom: 30px;
+}
+
+.search-box {
+	display: flex;
+	justify-content: center;
+	gap: 10px;
+	margin-bottom: 30px;
+}
+
+.search-box input {
+	width: 65%;
+	padding: 12px;
+	font-size: 16px;
+	border-radius: 6px;
+	border: 1px solid #ccc;
+}
+
+.search-box button {
+	padding: 12px 20px;
+	border-radius: 6px;
+	border: none;
+	background-color: #0d6efd;
+	color: white;
+	cursor: pointer;
+}
+
+.search-box button:hover {
+	background-color: #0b5ed7;
+}
+
+.movies-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+	gap: 20px;
+}
+
+.movie-card {
+	background: white;
+	padding: 12px;
+	border-radius: 10px;
+	text-align: center;
+	cursor: pointer;
+	transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.movie-card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+.movie-card img {
+	width: 100%;
+	height: 260px;
+	object-fit: cover;
+	border-radius: 6px;
+}
+
+.movie-card button {
+	margin-top: 8px;
+	padding: 6px;
+	width: 100%;
+	border-radius: 6px;
+	border: none;
+	background-color: #ffc107;
+	cursor: pointer;
+}
+
+.modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.6);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+}
+
+.modal.hidden {
+	display: none;
+}
+
+.modal-content {
+	position: relative;
+	background: white;
+	width: 80%;
+	max-width: 700px;
+	padding: 20px;
+	border-radius: 10px;
+}
+
+.close-btn {
+	position: absolute;
+	right: 15px;
+	top: 10px;
+	cursor: pointer;
+	font-size: 20px;
+	font-weight: bold;
+	z-index: 2000;
+}
+
+.footer {
+	margin-top: 50px;
+	padding: 20px;
+	text-align: center;
+	background-color: #0d6efd;
+	color: white;
+	font-size: 14px;
+}
+
+.footer p {
+	margin: 0;
+	line-height: 1.6;
+}
+
+.footer:hover {
+	background-color: #0b5ed7;
+}
