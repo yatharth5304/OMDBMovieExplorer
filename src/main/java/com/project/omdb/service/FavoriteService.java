@@ -1,5 +1,7 @@
 package com.project.omdb.service;
 
+import com.project.omdb.exception.AlreadyExistsException;
+import com.project.omdb.exception.ResourceNotFoundException;
 import com.project.omdb.model.Favorite;
 import com.project.omdb.repository.FavoriteRepository;
 import org.springframework.stereotype.Service;
@@ -16,8 +18,11 @@ public class FavoriteService {
     }
 
     public Favorite addFavorite(Favorite favorite) {
+        if (favorite.getImdbId() == null || favorite.getImdbId().isBlank()) {
+            throw new IllegalArgumentException("imdbId is required.");
+        }
         if (repository.existsByImdbId(favorite.getImdbId())) {
-            return null; // prevent duplicates
+            throw new AlreadyExistsException("Movie '" + favorite.getTitle() + "' is already in favorites.");
         }
         return repository.save(favorite);
     }
@@ -27,6 +32,10 @@ public class FavoriteService {
     }
 
     public void deleteFavorite(Long id) {
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException("Favorite with id " + id + " not found.");
+        }
         repository.deleteById(id);
     }
 }
+

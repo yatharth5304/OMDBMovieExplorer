@@ -1,139 +1,768 @@
+/* ============================================================
+   OMDB Explorer — Editorial Dark Theme
+   Design decisions:
+   - Playfair Display serif for headings (editorial, magazine feel)
+   - DM Sans for body (not the generic Inter/Poppins)
+   - Warm amber accent, not generic blue
+   - Film-poster aspect-ratio cards
+   - Overlay text on cards (not a text block below the image)
+   - Horizontal scroll for saved films (like a curated reel)
+   - Subtle film grain overlay for organic texture
+   - Left-aligned layout — avoids the over-centered AI look
+============================================================ */
+
+/* --- Design Tokens --- */
+:root {
+  --bg:            #0d0c10;
+  --surface:       #161419;
+  --surface-2:     #1e1b23;
+  --surface-3:     #252230;
+  --border:        rgba(255, 255, 255, 0.07);
+  --border-hi:     rgba(255, 255, 255, 0.13);
+
+  --text:          #ede9e0;
+  --text-2:        rgba(237, 233, 224, 0.52);
+  --text-muted:    rgba(237, 233, 224, 0.28);
+
+  --accent:        #d4934a;     /* warm amber — film, warmth, not generic blue */
+  --accent-dim:    rgba(212, 147, 74, 0.10);
+  --accent-glow:   rgba(212, 147, 74, 0.22);
+  --danger:        #c0595a;
+
+  --radius-s:      6px;
+  --radius-m:      11px;
+  --radius-l:      18px;
+
+  --font-display:  'Playfair Display', Georgia, serif;
+  --font-body:     'DM Sans', system-ui, -apple-system, sans-serif;
+
+  --ease:          cubic-bezier(0.4, 0, 0.2, 1);
+  --t-fast:        180ms;
+  --t-mid:         300ms;
+  --t-slow:        420ms;
+}
+
+/* --- Reset --- */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+img  { display: block; max-width: 100%; }
+
 body {
-	font-family: "Segoe UI", Arial, sans-serif;
-	background: linear-gradient(to right, #f8f9fa, #eef1f5);
-	margin: 0;
-	display: flex;
-	flex-direction: column;
-	min-height: 100vh;
+  font-family: var(--font-body);
+  background-color: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.container {
-	max-width: 1000px;
-	margin: auto;
-	padding: 30px 20px;
-	flex: 1;
+/* --- Film Grain Texture ---
+   Subtle organic noise over the entire page.
+   Pure CSS SVG — zero extra requests.
+*/
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  opacity: 0.028;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px;
 }
 
-h1 {
-	text-align: center;
-	margin-bottom: 30px;
+/* ============================================================
+   HEADER
+============================================================ */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(13, 12, 16, 0.86);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
 }
 
-.search-box {
-	display: flex;
-	justify-content: center;
-	gap: 10px;
-	margin-bottom: 30px;
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  gap: 36px;
 }
 
-.search-box input {
-	width: 65%;
-	padding: 12px;
-	font-size: 16px;
-	border-radius: 6px;
-	border: 1px solid #ccc;
+/* Logo — deliberately sparse and typographic */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+  text-decoration: none;
 }
 
-.search-box button {
-	padding: 12px 20px;
-	border-radius: 6px;
-	border: none;
-	background-color: #0d6efd;
-	color: white;
-	cursor: pointer;
+.logo-mark {
+  color: var(--accent);
+  font-size: 10px;
+  position: relative;
+  top: -1px;
 }
 
-.search-box button:hover {
-	background-color: #0b5ed7;
+.logo-text {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.015em;
+  color: var(--text);
 }
 
+.logo-text em {
+  font-style: italic;
+  color: var(--accent);
+  font-weight: 400;
+}
+
+/* Search Bar — embedded in header, not a standalone block */
+.search-wrap { flex: 1; max-width: 480px; }
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  padding: 0 4px 0 14px;
+  transition:
+    border-color var(--t-fast) var(--ease),
+    box-shadow   var(--t-fast) var(--ease);
+}
+
+.search-bar:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+.search-bar input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  padding: 11px 0;
+  min-width: 0;
+}
+
+.search-bar input::placeholder { color: var(--text-muted); }
+
+.search-bar button {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-2);
+  padding: 8px 11px;
+  border-radius: var(--radius-s);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--t-fast) var(--ease);
+}
+
+.search-bar button:hover { color: var(--accent); }
+
+/* ============================================================
+   MAIN LAYOUT
+============================================================ */
+.main-content {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 52px 32px 80px;
+}
+
+/* ============================================================
+   SECTION HEADERS
+   Left-aligned, typographic hierarchy. Not centered banners.
+============================================================ */
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--text);
+}
+
+.result-count {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.results-section { margin-bottom: 60px; }
+.results-section.hidden { display: none; }
+
+/* ============================================================
+   MOVIE CARDS (Search Results)
+   Poster-first, overlay text — not a card with text below.
+   Aspect ratio 2:3 matches film poster proportions.
+============================================================ */
 .movies-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-	gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+  gap: 16px;
 }
 
 .movie-card {
-	background: white;
-	padding: 12px;
-	border-radius: 10px;
-	text-align: center;
-	cursor: pointer;
-	transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  border-radius: var(--radius-m);
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  aspect-ratio: 2 / 3;
+  transition:
+    transform     var(--t-mid) var(--ease),
+    border-color  var(--t-fast) var(--ease);
 }
 
 .movie-card:hover {
-	transform: translateY(-5px);
-	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+  border-color: var(--border-hi);
 }
 
 .movie-card img {
-	width: 100%;
-	height: 260px;
-	object-fit: cover;
-	border-radius: 6px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--t-slow) var(--ease);
 }
 
-.movie-card button {
-	margin-top: 8px;
-	padding: 6px;
-	width: 100%;
-	border-radius: 6px;
-	border: none;
-	background-color: #ffc107;
-	cursor: pointer;
+.movie-card:hover img { transform: scale(1.05); }
+
+/* Gradient overlay — text always readable */
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(10, 9, 13, 0.96) 0%,
+    rgba(10, 9, 13, 0.55) 38%,
+    transparent 65%
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 13px 11px;
 }
 
+.card-title {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.card-year {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+}
+
+/* Save button — only appears on hover, slides up */
+.card-fav-btn {
+  margin-top: 9px;
+  padding: 7px 0;
+  width: 100%;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(5px);
+  transition:
+    opacity    var(--t-fast) var(--ease),
+    transform  var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease),
+    color      var(--t-fast) var(--ease);
+}
+
+.movie-card:hover .card-fav-btn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card-fav-btn:hover {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.card-fav-btn:disabled {
+  border-color: var(--text-muted);
+  color: var(--text-muted);
+  background: transparent;
+  cursor: default;
+}
+
+/* Poster fallback for missing images */
+.poster-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: 2.2rem;
+}
+
+/* ============================================================
+   SKELETON LOADERS
+============================================================ */
+.skeleton-card {
+  border-radius: var(--radius-m);
+  overflow: hidden;
+  aspect-ratio: 2 / 3;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.skeleton-pulse {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--surface)   25%,
+    var(--surface-2) 50%,
+    var(--surface)   75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ============================================================
+   FAVORITES STRIP
+   Horizontal scroll — feels like a curated film reel,
+   not a second grid copy of search results.
+============================================================ */
+.favorites-strip {
+  display: flex;
+  gap: 13px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-3) transparent;
+}
+
+.favorites-strip::-webkit-scrollbar { height: 3px; }
+.favorites-strip::-webkit-scrollbar-track { background: transparent; }
+.favorites-strip::-webkit-scrollbar-thumb {
+  background: var(--surface-3);
+  border-radius: 2px;
+}
+
+.fav-card {
+  position: relative;
+  flex-shrink: 0;
+  width: 125px;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-m);
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition:
+    transform     var(--t-mid) var(--ease),
+    border-color  var(--t-fast) var(--ease);
+}
+
+.fav-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-hi);
+}
+
+.fav-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--t-slow) var(--ease);
+}
+
+.fav-card:hover img { transform: scale(1.05); }
+
+.fav-card .card-overlay { padding: 10px 9px; }
+.fav-card .card-title   { font-size: 0.76rem; }
+
+/* Remove button — top-right, shown on hover */
+.remove-btn {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: rgba(13, 12, 16, 0.75);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border-hi);
+  color: var(--danger);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition:
+    opacity    var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease),
+    color      var(--t-fast) var(--ease),
+    border-color var(--t-fast) var(--ease);
+}
+
+.fav-card:hover .remove-btn { opacity: 1; }
+
+.remove-btn:hover {
+  background: var(--danger);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* Empty state */
+.empty-state {
+  color: var(--text-muted);
+  font-size: 0.84rem;
+  font-style: italic;
+  padding: 8px 0;
+  line-height: 1.6;
+}
+
+/* ============================================================
+   MODAL
+   Blur backdrop, centered panel, two-column layout.
+   Transition is scale+fade rather than the generic slide.
+============================================================ */
 .modal {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: rgba(0, 0, 0, 0.6);
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	z-index: 1000;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    opacity    var(--t-fast) var(--ease),
+    visibility var(--t-fast) var(--ease);
 }
 
-.modal.hidden {
-	display: none;
+.modal.open {
+  visibility: visible;
+  opacity: 1;
 }
 
-.modal-content {
-	position: relative;
-	background: white;
-	width: 80%;
-	max-width: 700px;
-	padding: 20px;
-	border-radius: 10px;
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 9, 13, 0.80);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
 }
 
-.close-btn {
-	position: absolute;
-	right: 15px;
-	top: 10px;
-	cursor: pointer;
-	font-size: 20px;
-	font-weight: bold;
-	z-index: 2000;
+.modal-panel {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border-hi);
+  border-radius: var(--radius-l);
+  width: 100%;
+  max-width: 740px;
+  max-height: 88vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transform: translateY(10px) scale(0.98);
+  transition: transform var(--t-mid) var(--ease);
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-3) transparent;
 }
 
-.footer {
-	margin-top: 50px;
-	padding: 20px;
-	text-align: center;
-	background-color: #0d6efd;
-	color: white;
-	font-size: 14px;
+.modal.open .modal-panel {
+  transform: translateY(0) scale(1);
 }
 
-.footer p {
-	margin: 0;
-	line-height: 1.6;
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background    var(--t-fast) var(--ease),
+    color         var(--t-fast) var(--ease),
+    border-color  var(--t-fast) var(--ease);
 }
 
-.footer:hover {
-	background-color: #0b5ed7;
+.modal-close:hover {
+  background: var(--danger);
+  color: #fff;
+  border-color: transparent;
+}
+
+/* Modal content layout */
+.modal-detail {
+  display: flex;
+  min-height: 360px;
+}
+
+.modal-poster {
+  flex-shrink: 0;
+  width: 210px;
+  border-radius: var(--radius-l) 0 0 var(--radius-l);
+  overflow: hidden;
+}
+
+.modal-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.modal-poster-fallback {
+  width: 100%;
+  height: 100%;
+  min-height: 340px;
+  background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  color: var(--text-muted);
+}
+
+.modal-info {
+  flex: 1;
+  padding: 34px 28px 34px 28px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.modal-genre {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 22px;
+}
+
+.modal-genre .dot {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.modal-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.modal-meta-row {
+  font-size: 0.82rem;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+.modal-meta-row strong {
+  color: var(--text);
+  font-weight: 600;
+  margin-right: 5px;
+}
+
+.modal-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--accent-dim);
+  border: 1px solid var(--accent-glow);
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.78rem;
+  padding: 3px 9px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  width: fit-content;
+  letter-spacing: 0.04em;
+}
+
+.modal-plot {
+  font-size: 0.83rem;
+  color: var(--text-2);
+  line-height: 1.75;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-top: auto;
+}
+
+/* Modal loading state */
+.modal-loading {
+  padding: 52px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+  min-height: 200px;
+}
+
+/* ============================================================
+   TOAST NOTIFICATIONS
+   From the right side — not centered popups.
+============================================================ */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 9px;
+}
+
+.toast {
+  background: var(--surface-2);
+  border: 1px solid var(--border-hi);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-m);
+  padding: 11px 16px;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--text);
+  max-width: 300px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+  animation: toast-slide-in var(--t-fast) var(--ease) forwards;
+}
+
+.toast.error { border-left-color: var(--danger); }
+
+.toast.removing {
+  animation: toast-slide-out var(--t-fast) var(--ease) forwards;
+}
+
+@keyframes toast-slide-in {
+  from { opacity: 0; transform: translateX(14px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes toast-slide-out {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(14px); }
+}
+
+/* ============================================================
+   FOOTER
+============================================================ */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 20px 32px;
+}
+
+.footer-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.footer-logo {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-style: italic;
+}
+
+.footer-copy {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 680px) {
+  .header-inner { padding: 0 16px; gap: 16px; }
+  .main-content { padding: 32px 16px 60px; }
+
+  .movies-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 12px;
+  }
+
+  .modal-detail  { flex-direction: column; }
+  .modal-poster  {
+    width: 100%;
+    height: 220px;
+    border-radius: var(--radius-l) var(--radius-l) 0 0;
+  }
+  .modal-info    { padding: 22px 18px; }
+
+  .footer-inner  { justify-content: center; text-align: center; }
+  .toast-container { bottom: 16px; right: 12px; left: 12px; align-items: stretch; }
+  .toast { max-width: none; }
 }

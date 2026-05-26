@@ -2,6 +2,11 @@ target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 
+### Secrets — never commit these ###
+.env
+.env.local
+application-local.properties
+application-secret.properties
 
 ### STS ###
 .apt_generated
@@ -27,6 +32,9 @@ target/
 build/
 !**/src/main/**/build/
 
-
 ### VS Code ###
 .vscode/
+
+### OS ###
+.DS_Store
+Thumbs.db
