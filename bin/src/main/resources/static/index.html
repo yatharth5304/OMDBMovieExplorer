@@ -7,7 +7,7 @@
   <title>OMDb Movie Explorer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600;1,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -17,14 +17,14 @@
   <header class="site-header">
     <div class="header-inner">
       <div class="logo">
-        <span class="logo-mark" aria-hidden="true">▶</span>
+        <span class="logo-mark" aria-hidden="true"></span>
         <span class="logo-text">OMDB <em>Explorer</em></span>
       </div>
       <div class="search-wrap">
         <div class="search-bar">
           <input type="text" id="searchInput" placeholder="Search any film or series…" autocomplete="off" aria-label="Search movies">
           <button id="searchBtn" aria-label="Run search">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
             </svg>
           </button>
@@ -35,21 +35,28 @@
 
   <main class="main-content">
 
+    <!-- Discovery hero — shown on landing, hidden via CSS :has() when search results appear -->
+    <div class="discovery-hero">
+      <p class="hero-eyebrow">Film Discovery</p>
+      <h1 class="hero-headline">Every great night<br><em>starts with a title.</em></h1>
+      <p class="hero-sub">Search above to explore the archive.</p>
+    </div>
+
     <section id="searchSection" class="results-section hidden" aria-label="Search results">
       <div class="section-header">
-        <h2 class="section-title">Results</h2>
+        <span class="section-label">Results</span>
         <span id="resultCount" class="result-count" aria-live="polite"></span>
       </div>
       <div id="movies" class="movies-grid" role="list"></div>
     </section>
 
-    <section class="favorites-section" aria-label="Saved films">
+    <section class="collection-section" aria-label="Your collection">
       <div class="section-header">
-        <h2 class="section-title">Saved</h2>
+        <span class="section-label">Your Collection</span>
         <span id="favCount" class="result-count" aria-live="polite"></span>
       </div>
       <div id="favorites" class="favorites-strip" role="list"></div>
-      <p id="emptyFav" class="empty-state">No saved films yet — search and add your favourites.</p>
+      <p id="emptyFav" class="empty-state">Nothing saved yet — find something worth watching.</p>
     </section>
 
   </main>
@@ -59,7 +66,7 @@
     <div class="modal-backdrop" id="modalBackdrop"></div>
     <div class="modal-panel">
       <button class="modal-close" id="modalClose" aria-label="Close details">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
       </button>
@@ -72,7 +79,7 @@
 
   <footer class="site-footer">
     <div class="footer-inner">
-      <span class="footer-logo">▶ OMDB <em>Explorer</em></span>
+      <span class="footer-logo">OMDB <em>Explorer</em></span>
       <span class="footer-copy">Yatharth Maharwade &middot; Spring Boot &amp; JavaScript</span>
     </div>
   </footer>
@@ -80,4 +87,3 @@
   <script src="js/omdb.js"></script>
 </body>
 </html>
-

@@ -30,4 +30,6 @@ COPY --from=build /app/target/*.jar app.jar
 # Render injects PORT at runtime; default 8080 for local runs
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# -XX:TieredStopAtLevel=1 disables JIT optimisation tiers above level 1 at startup
+# Result: JVM starts noticeably faster (trades peak throughput for cold-start speed)
+ENTRYPOINT ["java", "-XX:TieredStopAtLevel=1", "-jar", "app.jar"]
