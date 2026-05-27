@@ -208,24 +208,13 @@ async function searchMovies() {
 
 // ============================================================
 //  Favorites — Load
-//  Race-condition guard: each call gets a sequence number.
-//  If a newer call has started while this one was awaiting the
-//  server (e.g. slow cold-start / lazy JPA init on first touch),
-//  the stale response is silently discarded so it can never
-//  wipe cards that a faster, newer call already rendered.
 // ============================================================
 
-let _favSeq = 0;
-
 async function loadFavorites() {
-  const mySeq = ++_favSeq;
   try {
     const res = await fetch('/api/favorites');
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-
-    // Another call started while we were waiting — our data is stale, bail out.
-    if (mySeq !== _favSeq) return;
 
     favoritesDiv.innerHTML = '';
 
@@ -239,7 +228,6 @@ async function loadFavorites() {
     }
 
   } catch (err) {
-    if (mySeq !== _favSeq) return; // stale error — don't show a toast for an old request
     console.error('[Favorites]', err);
     showToast('Could not load saved films.', 'error');
   }

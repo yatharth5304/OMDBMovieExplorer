@@ -1,0 +1,23 @@
+# Build artifacts
+target/
+
+# IDE & OS files
+.idea/
+*.iml
+.classpath
+.project
+.settings/
+*.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Maven wrapper (only the binary is needed, not the dist)
+.mvn/wrapper/maven-wrapper.jar
+
+# Docs
+README.md
+HELP.md
